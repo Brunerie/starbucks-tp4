@@ -2,26 +2,27 @@
 
 import {useEffect, useState} from "react";
 import {getUser} from "../../utils/supabase";
-import {createClientComponentClient} from "@supabase/auth-helpers-nextjs";
+import {createClientComponentClient, User} from "@supabase/auth-helpers-nextjs";
 import { Session } from "@supabase/gotrue-js/src/lib/types"
 import {Button, SectionContainer} from "tp-kit/components";
 import {useRouter} from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const [user, setUser] = useState<Session>();
   const supabase = createClientComponentClient();
+  const [userDetails, setUserDetails] = useState<User | null >(null);
 
   useEffect(() => {
-    getUser(supabase).then((user) => {
-      // @ts-ignore
-      if (user.session) {
-        // @ts-ignore
-        setUser(user.session)
+    const getData = async () => {
+      const user = await getUser(supabase);
+      console.log(user?.user_metadata.name);
+      if (user) {
+        setUserDetails(user);
       } else {
-        router.push('/connexion')
+        router.push('/connexion');
       }
-    })
+    };
+    getData();
   }, []);
 
   return (
@@ -31,14 +32,14 @@ export default function Page() {
             MON COMPTE
           </p>
           <p className="my-4">
-            Bonjour, {user?.user.user_metadata.name} !
+            Bonjour, {userDetails?.user_metadata.name} !
           </p>
           <div className="my-4">
             <p>
-              Nom : {user?.user.user_metadata.name}
+              Nom : {userDetails?.user_metadata.name}
             </p>
             <p>
-              Email : {user?.user.email}
+              Email : {userDetails?.email}
             </p>
           </div>
           <Button

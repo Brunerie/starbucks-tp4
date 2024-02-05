@@ -72,7 +72,6 @@ export async function generateStaticParams() {
         productSlug: "cold-brew-latte",
         },
     }));
-}
 
 export default async function ProductPage({ params }: NextPageProps<Props>) {
   const product = await getProduct(params.productSlug);
